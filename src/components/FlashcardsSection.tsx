@@ -86,7 +86,7 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
     return (
       <div
         className={`
-          relative cursor-pointer transition-all duration-1200 transform-style-preserve-3d
+          relative cursor-pointer transition-all duration-800 transform-style-preserve-3d
           ${isFlipped ? 'rotate-y-180' : ''}
           ${isCenter ? 'z-20 scale-105' : 'z-10 scale-95 opacity-80'}
           shadow-xl hover:shadow-2xl hover:scale-110
@@ -136,7 +136,7 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
     return (
       <div
         className={`
-          relative cursor-pointer transition-transform duration-1200 transform-style-preserve-3d
+          relative cursor-pointer transition-transform duration-800 transform-style-preserve-3d
           ${isFlipped ? 'rotate-y-180' : ''}
           shadow-lg hover:shadow-xl hover:scale-105
         `}
