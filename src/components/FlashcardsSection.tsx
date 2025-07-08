@@ -229,8 +229,39 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
             )}
           </div>
 
-          {/* Navigation */}
-          {/* ... phần navigation giữ nguyên ... */}
+         {/* Navigation */}
+          <div className="flex justify-between items-center">
+            <button
+              onClick={prevCard}
+              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 disabled:opacity-50"
+              disabled={flashcards.length <= 1}
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="font-medium">Trước</span>
+            </button>
+
+            <div className="text-center">
+              <div className="text-sm text-gray-500 mb-2">
+                {currentCard + 1} / {flashcards.length}
+              </div>
+              <button
+                onClick={resetCards}
+                className="flex items-center space-x-2 px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <RotateCcw className="w-5 h-5" />
+                <span className="font-medium">Bắt đầu lại</span>
+              </button>
+            </div>
+
+            <button
+              onClick={nextCard}
+              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 disabled:opacity-50"
+              disabled={flashcards.length <= 1}
+            >
+              <span className="font-medium">Sau</span>
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </>
       ) : (
         <>
@@ -249,8 +280,16 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
             ))}
           </div>
 
-          {/* Grid Controls */}
-          {/* ... phần grid controls giữ nguyên ... */}
+         {/* Grid Controls */}
+          <div className="text-center">
+            <button
+              onClick={() => setFlippedCards({})}
+              className="flex items-center space-x-2 px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl mx-auto"
+            >
+              <RotateCcw className="w-5 h-5" />
+              <span className="font-medium">Lật tất cả về mặt trước</span>
+            </button>
+          </div>
         </>
       )}
     </div>
