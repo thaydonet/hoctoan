@@ -72,7 +72,7 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
     );
   }
 
-  // Single Card Component
+ // Cập nhật SingleCard Component
   const SingleCard = ({ card, cardIndex, onClick, isCenter = false, frontColor, backColor }: {
     card: FlashCard;
     cardIndex: number;
@@ -83,93 +83,55 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
   }) => {
     const isFlipped = flippedCards[cardIndex] || false;
     
-    return (
-      <div
-        className={`
-          relative cursor-pointer transition-all duration-800 transform-style-preserve-3d
-          ${isFlipped ? 'rotate-y-180' : ''}
-          ${isCenter ? 'z-20 scale-105' : 'z-10 scale-95 opacity-80'}
-          shadow-xl hover:shadow-2xl hover:scale-110
-        `}
-        onClick={onClick}
-        style={{ perspective: '1200px', width: '320px', height: '200px' }}
-      >
-        {/* Front */}
-        <div className="absolute inset-0 w-full h-full backface-hidden">
-          <div className={`bg-gradient-to-br ${frontColor} rounded-xl shadow-2xl p-6 h-full flex flex-col justify-center text-white`}>
-            <div className="text-center">
-              <div className="text-sm font-medium text-white opacity-80 mb-3">CÂU HỎI</div>
-              <div className="text-lg font-semibold leading-relaxed mb-4 text-gray-800">
-                {card.question}
-              </div>
-              <div className="text-sm text-white opacity-80 flex items-center justify-center space-x-2">
-                <RotateCcw className="w-4 h-4" />
-                <span>Nhấp để xem đáp án</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Back */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-          <div className={`bg-gradient-to-br ${backColor} rounded-xl shadow-2xl p-6 h-full flex flex-col justify-center text-white`}>
-            <div className="text-center">
-              <div className="text-sm font-medium text-white opacity-80 mb-3">ĐÁP ÁN</div>
-              <div className="text-lg font-semibold leading-relaxed mb-4 text-gray-800">
-                {card.answer}
-              </div>
-              <div className="text-sm text-white opacity-80 flex items-center justify-center space-x-2">
-                <RotateCcw className="w-4 h-4" />
-                <span>Nhấp để xem câu hỏi</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+    // ⭐ Thay đổi chính: Áp dụng transition và transform phức tạp hơn
+    const cardStyle = {
+      perspective: '1500px', // Tăng perspective để hiệu ứng 3D rõ hơn
+    };
 
-  // Grid Card Component
-  const GridCard = ({ card, cardIndex, frontColor, backColor }: { card: FlashCard; cardIndex: number; frontColor: string; backColor: string; }) => {
-    const isFlipped = flippedCards[cardIndex] || false;
+    const innerStyle = {
+      transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Tốc độ 0.8s với easing tùy chỉnh
+      transform: isFlipped ? 'rotateY(180deg) scale(1)' : 'rotateY(0deg) scale(1)',
+      transformStyle: 'preserve-3d' as const,
+    };
     
     return (
       <div
-        className={`
-          relative cursor-pointer transition-transform duration-800 transform-style-preserve-3d
-          ${isFlipped ? 'rotate-y-180' : ''}
-          shadow-lg hover:shadow-xl hover:scale-105
-        `}
-        onClick={() => flipCard(cardIndex)}
-        style={{ perspective: '1000px', height: '200px' }}
+        className={`relative cursor-pointer group`}
+        onClick={onClick}
+        style={cardStyle}
       >
-        {/* Front */}
-        <div className="absolute inset-0 w-full h-full backface-hidden">
-          <div className={`bg-gradient-to-br ${frontColor} rounded-xl p-4 h-full flex flex-col justify-center text-white`}>
-            <div className="text-center">
-              <div className="text-xs font-medium text-white opacity-80 mb-2">CÂU HỎI {cardIndex + 1}</div>
-              <div className="text-sm font-semibold leading-relaxed mb-3 line-clamp-4 text-gray-800">
-                {card.question}
-              </div>
-              <div className="text-xs text-white opacity-80 flex items-center justify-center space-x-1">
-                <RotateCcw className="w-3 h-3" />
-                <span>Nhấp để lật</span>
+        <div 
+          className="relative w-[320px] h-[200px] shadow-xl group-hover:shadow-2xl"
+          style={innerStyle}
+        >
+          {/* Front */}
+          <div className="absolute inset-0 w-full h-full backface-hidden">
+            <div className={`bg-gradient-to-br ${frontColor} rounded-xl p-6 h-full flex flex-col justify-center text-white`}>
+              <div className="text-center">
+                <div className="text-sm font-medium text-white opacity-80 mb-3">CÂU HỎI</div>
+                <div className="text-lg font-semibold leading-relaxed mb-4 text-gray-800">
+                  {card.question}
+                </div>
+                <div className="text-sm text-white opacity-80 flex items-center justify-center space-x-2">
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Nhấp để xem đáp án</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Back */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-          <div className={`bg-gradient-to-br ${backColor} rounded-xl p-4 h-full flex flex-col justify-center text-white`}>
-            <div className="text-center">
-              <div className="text-xs font-medium text-white opacity-80 mb-2">ĐÁP ÁN {cardIndex + 1}</div>
-              <div className="text-sm font-semibold leading-relaxed mb-3 line-clamp-4 text-gray-800">
-                {card.answer}
-              </div>
-              <div className="text-xs text-white opacity-80 flex items-center justify-center space-x-1">
-                <RotateCcw className="w-3 h-3" />
-                <span>Nhấp để lật</span>
+          
+          {/* Back */}
+          <div className="absolute inset-0 w-full h-full backface-hidden" style={{ transform: 'rotateY(180deg)' }}>
+            <div className={`bg-gradient-to-br ${backColor} rounded-xl p-6 h-full flex flex-col justify-center text-white`}>
+              <div className="text-center">
+                <div className="text-sm font-medium text-white opacity-80 mb-3">ĐÁP ÁN</div>
+                <div className="text-lg font-semibold leading-relaxed mb-4 text-gray-800">
+                  {card.answer}
+                </div>
+                <div className="text-sm text-white opacity-80 flex items-center justify-center space-x-2">
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Nhấp để xem câu hỏi</span>
+                </div>
               </div>
             </div>
           </div>
@@ -178,57 +140,85 @@ const FlashcardsSection: React.FC<FlashcardsSectionProps> = ({ flashcards, onMat
     );
   };
 
-  return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-3">
-          <Zap className="w-8 h-8 text-purple-500" />
-          <h2 className="text-2xl font-bold text-gray-900">Flashcards</h2>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            {flashcards.length} thẻ
+  // Cập nhật GridCard Component
+  const GridCard = ({ card, cardIndex, frontColor, backColor }: { card: FlashCard; cardIndex: number; frontColor: string; backColor: string; }) => {
+    const isFlipped = flippedCards[cardIndex] || false;
+    
+    // ⭐ Thay đổi chính: Áp dụng transition và transform phức tạp hơn
+    const cardStyle = {
+      perspective: '1200px', // Tăng perspective
+      height: '200px',
+    };
+
+    const innerStyle = {
+      transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Tốc độ 0.8s với easing tùy chỉnh
+      transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+      transformStyle: 'preserve-3d' as const,
+    };
+    
+    return (
+      <div
+        className="relative cursor-pointer group"
+        onClick={() => flipCard(cardIndex)}
+        style={cardStyle}
+      >
+        <div 
+          className="relative w-full h-full shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-transform duration-300" 
+          style={innerStyle}
+        >
+          {/* Front */}
+          <div className="absolute inset-0 w-full h-full backface-hidden">
+            <div className={`bg-gradient-to-br ${frontColor} rounded-xl p-4 h-full flex flex-col justify-center text-white`}>
+              <div className="text-center">
+                <div className="text-xs font-medium text-white opacity-80 mb-2">CÂU HỎI {cardIndex + 1}</div>
+                <div className="text-sm font-semibold leading-relaxed mb-3 line-clamp-4 text-gray-800">
+                  {card.question}
+                </div>
+                <div className="text-xs text-white opacity-80 flex items-center justify-center space-x-1">
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Nhấp để lật</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setViewMode('single')}
-              className={`flex items-center space-x-2 px-3 py-1 rounded-lg text-sm ${
-                viewMode === 'single' ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              <Grid className="w-4 h-4" />
-              <span>Từng thẻ</span>
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`flex items-center space-x-2 px-3 py-1 rounded-lg text-sm ${
-                viewMode === 'grid' ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              <List className="w-4 h-4" />
-              <span>Tất cả</span>
-            </button>
+          
+          {/* Back */}
+          <div className="absolute inset-0 w-full h-full backface-hidden" style={{ transform: 'rotateY(180deg)' }}>
+            <div className={`bg-gradient-to-br ${backColor} rounded-xl p-4 h-full flex flex-col justify-center text-white`}>
+              <div className="text-center">
+                <div className="text-xs font-medium text-white opacity-80 mb-2">ĐÁP ÁN {cardIndex + 1}</div>
+                <div className="text-sm font-semibold leading-relaxed mb-3 line-clamp-4 text-gray-800">
+                  {card.answer}
+                </div>
+                <div className="text-xs text-white opacity-80 flex items-center justify-center space-x-1">
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Nhấp để lật</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    );
+  };
 
-      {viewMode === 'single' ? (
-        <>
-          {/* Single Card View */}
-          <div className="flex justify-center mb-8">
-            {cardColors.length > 0 && ( // Đảm bảo màu đã được tạo
-              <SingleCard
-                card={flashcards[currentCard]}
-                cardIndex={currentCard}
-                onClick={() => flipCard(currentCard)}
-                isCenter={true}
-                frontColor={cardColors[currentCard].front}
-                backColor={cardColors[currentCard].back}
-              />
-            )}
-          </div>
+// ... (Trong phần render, nhớ cập nhật lại cách gọi SingleCard)
 
+{viewMode === 'single' ? (
+  <>
+    {/* Single Card View */}
+    <div className="flex justify-center items-center mb-8 h-[220px]">
+      {cardColors.length > 0 && (
+        <SingleCard
+          card={flashcards[currentCard]}
+          cardIndex={currentCard}
+          onClick={() => flipCard(currentCard)}
+          isCenter={true}
+          frontColor={cardColors[currentCard].front}
+          backColor={cardColors[currentCard].back}
+        />
+      )}
+    </div>
          {/* Navigation */}
           <div className="flex justify-between items-center">
             <button
