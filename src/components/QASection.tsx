@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Search, Filter, Clock, User, CheckCircle } from 'lucide-react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase/auth';
 import { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -53,6 +55,7 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
     tags: [] as string[],
     difficulty: 'medium' as 'easy' | 'medium' | 'hard'
   });
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     onMathJaxRender();
@@ -147,11 +150,16 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
   };
 
   const handleAskQuestion = async () => {
+    if (!user) {
+      alert('Vui lòng đăng nhập để đặt câu hỏi!');
+      return;
+    }
+    
     // Logic để thêm câu hỏi mới
     const question: Question = {
       id: Date.now().toString(),
-      userId: 'current-user',
-      userName: 'Bạn',
+      userId: user.uid,
+      userName: user.displayName || user.email || 'Người dùng',
       title: newQuestion.title,
       content: newQuestion.content,
       chapter: chapter || 'Chương 1',
@@ -320,19 +328,28 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
             ))}
 
             {/* Add Answer Form */}
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h4 className="font-semibold text-blue-800 mb-4">Thêm câu trả lời của bạn</h4>
-              <textarea
-                className="w-full p-4 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                rows={4}
-                placeholder="Nhập câu trả lời của bạn..."
-              />
-              <div className="flex justify-end mt-4">
+            {user ? (
+              <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                <h4 className="font-semibold text-blue-800 mb-4">Thêm câu trả lời của bạn</h4>
+                <textarea
+                  className="w-full p-4 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  rows={4}
+                  placeholder="Nhập câu trả lời của bạn..."
+                />
+                <div className="flex justify-end mt-4">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                    Gửi câu trả lời
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+                <p className="text-gray-600 mb-4">Đăng nhập để trả lời câu hỏi này</p>
                 <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
-                  Gửi câu trả lời
+                  Đăng nhập
                 </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -347,13 +364,20 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
           <MessageCircle className="w-8 h-8 text-blue-500" />
           <h2 className="text-2xl font-bold text-gray-900">Hỏi đáp</h2>
         </div>
-        <button
-          onClick={() => setShowAskForm(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
-        >
-          <MessageCircle className="w-5 h-5" />
-          <span>Đặt câu hỏi</span>
-        </button>
+        {user ? (
+          <button
+            onClick={() => setShowAskForm(true)}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>Đặt câu hỏi</span>
+          </button>
+        ) : (
+          <div className="bg-gray-100 px-6 py-3 rounded-lg text-gray-600 flex items-center space-x-2">
+            <MessageCircle className="w-5 h-5" />
+            <span>Đăng nhập để đặt câu hỏi</span>
+          </div>
+        )}
       </div>
 
       {/* Search and Filter */}

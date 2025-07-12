@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, MessageCircle } from 'lucide-react';
+import AuthButton from './AuthButton';
 import { mathChapters } from '../data/mathChapters';
 import { Chapter } from '../types/MathTopic';
 
@@ -22,6 +23,12 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
         <div className="absolute inset-0 bg-black opacity-10"></div>
+        
+        {/* Auth Button - Top Right */}
+        <div className="absolute top-6 right-6 z-10">
+          <AuthButton />
+        </div>
+        
         <div className="relative max-w-7xl mx-auto px-6 py-20">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
@@ -78,6 +85,11 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
                 </div>
                 <div className="text-white/90 text-sm">
                   {chapter.lessons.length} bài học
+                </div>
+                <div className="mt-2">
+                  <span className="text-xs bg-white/20 px-2 py-1 rounded-full text-white">
+                    Miễn phí
+                  </span>
                 </div>
               </div>
 
@@ -174,6 +186,11 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
               <p className="text-gray-600 leading-relaxed text-sm">
                 Hỏi đáp với cộng đồng học sinh và giáo viên, chia sẻ kiến thức
               </p>
+              <div className="mt-4">
+                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                  Cần đăng nhập
+                </span>
+              </div>
             </div>
 
           </div>

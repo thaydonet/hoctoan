@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, Check, X, RotateCcw, Trophy, CheckCircle, XCircle, Edit3, List, Grid } from 'lucide-react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { collection, addDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/auth';
 import { QuizQuestion, TrueFalseQuestion, ShortAnswerQuestion } from '../types/MathTopic';
 
 interface QuizSectionProps {
@@ -23,6 +26,8 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
   const [quizMode, setQuizMode] = useState<'single' | 'all'>('single');
   const [showReview, setShowReview] = useState(false);
+  const [user] = useAuthState(auth);
+  const [isSavingResult, setIsSavingResult] = useState(false);
 
   // Shuffle array function
   const shuffleArray = (array: any[]) => {
@@ -172,6 +177,33 @@ const QuizSection: React.FC<QuizSectionProps> = ({
     return correct;
   };
 
+  // Save quiz result to Firebase
+  const saveQuizResult = async (score: number, totalQuestions: number) => {
+    if (!user) return;
+    
+    setIsSavingResult(true);
+    try {
+      await addDoc(collection(db, 'quizResults'), {
+        userId: user.uid,
+        userName: user.displayName || user.email,
+        quizType: quizType,
+        score: score,
+        totalQuestions: totalQuestions,
+        percentage: Math.round((score / totalQuestions) * 100),
+        timeSpent: Date.now(), // You can implement actual time tracking
+        completedAt: new Date(),
+        answers: selectedAnswers,
+        chapter: 'Current Chapter', // You can pass this as prop
+        lesson: 'Current Lesson'    // You can pass this as prop
+      });
+      console.log('Quiz result saved successfully');
+    } catch (error) {
+      console.error('Error saving quiz result:', error);
+    } finally {
+      setIsSavingResult(false);
+    }
+  };
+
   if (currentQuestions.length === 0) {
     return (
       <div className="text-center py-12">
@@ -185,6 +217,13 @@ const QuizSection: React.FC<QuizSectionProps> = ({
     const score = calculateScore();
     const percentage = Math.round((score / currentQuestions.length) * 100);
     
+    // Auto-save result if user is logged in
+    useEffect(() => {
+      if (user && !isSavingResult) {
+        saveQuizResult(score, currentQuestions.length);
+      }
+    }, []);
+    
     return (
       <div className="max-w-2xl mx-auto text-center">
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -194,6 +233,24 @@ const QuizSection: React.FC<QuizSectionProps> = ({
           <p className="text-xl text-gray-700 mb-6">
             Bạn đã trả lời đúng {score}/{currentQuestions.length} câu
           </p>
+          
+          {/* Login prompt for saving results */}
+          {!user && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-blue-800 text-sm">
+                💡 Đăng nhập để lưu kết quả và theo dõi tiến độ học tập của bạn!
+              </p>
+            </div>
+          )}
+          
+          {user && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p className="text-green-800 text-sm">
+                ✅ Kết quả đã được lưu vào tài khoản của bạn!
+              </p>
+            </div>
+          )}
+          
           <div className="flex justify-center space-x-4">
             <button
               onClick={resetQuiz}
@@ -408,6 +465,12 @@ const QuizSection: React.FC<QuizSectionProps> = ({
           >
             Hoàn thành ({selectedAnswers.filter(a => a !== undefined).length}/{currentQuestions.length})
           </button>
+         
+         {!user && (
+           <p className="text-sm text-gray-600 mt-3">
+             💡 Đăng nhập để lưu kết quả bài tập
+           </p>
+         )}
         </div>
       </div>
     );
