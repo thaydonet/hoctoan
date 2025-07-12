@@ -21,7 +21,6 @@ declare global {
 function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
-  const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant'>('theory');
   const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa'>('theory');
   const [currentView, setCurrentView] = useState<'home' | 'lesson'>('home');
 
