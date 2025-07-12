@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, MessageCircle, Bot } from 'lucide-react';
+import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, MessageCircle } from 'lucide-react';
 import { mathChapters } from '../data/mathChapters';
 import { Chapter } from '../types/MathTopic';
 
@@ -176,15 +176,6 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6">
-                <Bot className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Trợ lý AI thông minh</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                AI hỗ trợ giải thích khái niệm, hướng dẫn giải bài và đưa ra gợi ý học tập
-              </p>
-            </div>
           </div>
         </div>
       </div>

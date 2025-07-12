@@ -7,12 +7,11 @@ import ExamplesSection from './ExamplesSection';
 import QuizSection from './QuizSection';
 import HomeworkSection from './HomeworkSection';
 import QASection from './QASection';
-import StudyAssistant from './StudyAssistant';
 
 interface MainContentProps {
   topic: MathTopic;
-  activeSection: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant';
-  onSectionChange: (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant') => void;
+  activeSection: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa';
+  onSectionChange: (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa') => void;
   onMathJaxRender: () => void;
 }
 
@@ -36,8 +35,6 @@ const MainContent: React.FC<MainContentProps> = ({ topic, activeSection, onSecti
         return <HomeworkSection assignments={topic.homework} onMathJaxRender={onMathJaxRender} />;
       case 'qa':
         return <QASection chapter={topic.title} lesson={topic.description} onMathJaxRender={onMathJaxRender} />;
-      case 'assistant':
-        return <StudyAssistant chapter={topic.title} lesson={topic.description} onMathJaxRender={onMathJaxRender} />;
       default:
         return <TheorySection theory={topic.theory} onMathJaxRender={onMathJaxRender} />;
     }

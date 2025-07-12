@@ -22,6 +22,7 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
   const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant'>('theory');
+  const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa'>('theory');
   const [currentView, setCurrentView] = useState<'home' | 'lesson'>('home');
 
   // Function to re-render MathJax
@@ -126,7 +127,7 @@ function App() {
   };
 
 
-  const handleSectionChange = (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant') => {
+  const handleSectionChange = (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa') => {
     setActiveSection(section);
     if (selectedChapter && selectedTopic) {
       updateURL(selectedChapter.id, selectedTopic.id, section);

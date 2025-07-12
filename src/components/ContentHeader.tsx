@@ -1,11 +1,11 @@
 import React from 'react';
-import { Book, Zap, FileText, Brain, PenTool, MessageCircle, Bot } from 'lucide-react';
+import { Book, Zap, FileText, Brain, PenTool, MessageCircle } from 'lucide-react';
 import { MathTopic } from '../types/MathTopic';
 
 interface ContentHeaderProps {
   topic: MathTopic;
-  activeSection: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant';
-  onSectionChange: (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa' | 'assistant') => void;
+  activeSection: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa';
+  onSectionChange: (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa') => void;
 }
 
 const ContentHeader: React.FC<ContentHeaderProps> = ({ topic, activeSection, onSectionChange }) => {
@@ -15,8 +15,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({ topic, activeSection, onS
     { id: 'examples', label: 'Ví dụ', icon: FileText, color: 'green' },
     { id: 'quiz', label: 'Trắc nghiệm', icon: Brain, color: 'orange' },
     { id: 'homework', label: 'Bài tập', icon: PenTool, color: 'red' },
-    { id: 'qa', label: 'Hỏi đáp', icon: MessageCircle, color: 'blue' },
-    { id: 'assistant', label: 'Trợ lý AI', icon: Bot, color: 'purple' }
+    { id: 'qa', label: 'Hỏi đáp', icon: MessageCircle, color: 'blue' }
   ] as const;
 
   return (

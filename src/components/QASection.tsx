@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Search, Filter, Clock, User, CheckCircle } from 'lucide-react';
+import { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 interface Question {
   id: string;
@@ -58,6 +60,42 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
 
   // Mock data - trong thực tế sẽ load từ Firebase
   useEffect(() => {
+    loadQuestionsFromFirebase();
+  }, []);
+
+  // Load questions from Firebase
+  const loadQuestionsFromFirebase = async () => {
+    try {
+      const q = query(
+        collection(db, 'questions'),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const loadedQuestions: Question[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        loadedQuestions.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          answers: data.answers?.map((answer: any) => ({
+            ...answer,
+            createdAt: answer.createdAt?.toDate() || new Date()
+          })) || []
+        } as Question);
+      });
+      
+      setQuestions(loadedQuestions);
+    } catch (error) {
+      console.error('Error loading questions:', error);
+      // Fallback to mock data if Firebase fails
+      loadMockData();
+    }
+  };
+
+  // Mock data fallback
+  const loadMockData = () => {
     const mockQuestions: Question[] = [
       {
         id: '1',
@@ -106,9 +144,9 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
       }
     ];
     setQuestions(mockQuestions);
-  }, []);
+  };
 
-  const handleAskQuestion = () => {
+  const handleAskQuestion = async () => {
     // Logic để thêm câu hỏi mới
     const question: Question = {
       id: Date.now().toString(),
@@ -127,9 +165,26 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
       isSolved: false
     };
     
-    setQuestions(prev => [question, ...prev]);
-    setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium' });
-    setShowAskForm(false);
+    try {
+      // Save to Firebase
+      const docRef = await addDoc(collection(db, 'questions'), {
+        ...question,
+        createdAt: new Date(),
+        answers: []
+      });
+      
+      // Update local state with Firebase ID
+      const questionWithId = { ...question, id: docRef.id };
+      setQuestions(prev => [questionWithId, ...prev]);
+      setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium' });
+      setShowAskForm(false);
+    } catch (error) {
+      console.error('Error adding question:', error);
+      // Fallback to local state only
+      setQuestions(prev => [question, ...prev]);
+      setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium' });
+      setShowAskForm(false);
+    }
   };
 
   const filteredQuestions = questions.filter(q => {
