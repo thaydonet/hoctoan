@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Search, Filter, Clock, User, CheckCircle } from 'lucide-react';
+import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Search, Filter, Clock, User, CheckCircle, Edit, Save, X, Image, Upload } from 'lucide-react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/auth';
-import { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 interface Question {
@@ -12,6 +12,7 @@ interface Question {
   userAvatar?: string;
   title: string;
   content: string;
+  images?: string[];
   chapter: string;
   lesson: string;
   difficulty: 'easy' | 'medium' | 'hard';
@@ -30,6 +31,7 @@ interface Answer {
   userName: string;
   userAvatar?: string;
   content: string;
+  images?: string[];
   createdAt: Date;
   upvotes: number;
   downvotes: number;
@@ -53,15 +55,22 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
     title: '',
     content: '',
     tags: [] as string[],
-    difficulty: 'medium' as 'easy' | 'medium' | 'hard'
+    difficulty: 'medium' as 'easy' | 'medium' | 'hard',
+    images: [] as string[]
   });
+  const [newAnswer, setNewAnswer] = useState({
+    content: '',
+    images: [] as string[]
+  });
+  const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
+  const [editingAnswer, setEditingAnswer] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
   const [user] = useAuthState(auth);
 
   useEffect(() => {
     onMathJaxRender();
   }, [selectedQuestion, questions, onMathJaxRender]);
 
-  // Mock data - trong thực tế sẽ load từ Firebase
   useEffect(() => {
     loadQuestionsFromFirebase();
   }, []);
@@ -92,7 +101,6 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
       setQuestions(loadedQuestions);
     } catch (error) {
       console.error('Error loading questions:', error);
-      // Fallback to mock data if Firebase fails
       loadMockData();
     }
   };
@@ -149,19 +157,55 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
     setQuestions(mockQuestions);
   };
 
+  const handleImageUpload = (files: FileList | null, type: 'question' | 'answer') => {
+    if (!files) return;
+    
+    // In a real app, you would upload to Firebase Storage or another service
+    // For now, we'll just create placeholder URLs
+    const imageUrls = Array.from(files).map((file, index) => 
+      `https://via.placeholder.com/400x300?text=Image+${index + 1}`
+    );
+    
+    if (type === 'question') {
+      setNewQuestion(prev => ({
+        ...prev,
+        images: [...prev.images, ...imageUrls]
+      }));
+    } else {
+      setNewAnswer(prev => ({
+        ...prev,
+        images: [...prev.images, ...imageUrls]
+      }));
+    }
+  };
+
+  const removeImage = (index: number, type: 'question' | 'answer') => {
+    if (type === 'question') {
+      setNewQuestion(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    } else {
+      setNewAnswer(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
   const handleAskQuestion = async () => {
     if (!user) {
       alert('Vui lòng đăng nhập để đặt câu hỏi!');
       return;
     }
     
-    // Logic để thêm câu hỏi mới
     const question: Question = {
       id: Date.now().toString(),
       userId: user.uid,
       userName: user.displayName || user.email || 'Người dùng',
       title: newQuestion.title,
       content: newQuestion.content,
+      images: newQuestion.images,
       chapter: chapter || 'Chương 1',
       lesson: lesson || 'Bài học',
       difficulty: newQuestion.difficulty,
@@ -174,25 +218,112 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
     };
     
     try {
-      // Save to Firebase
       const docRef = await addDoc(collection(db, 'questions'), {
         ...question,
         createdAt: new Date(),
         answers: []
       });
       
-      // Update local state with Firebase ID
       const questionWithId = { ...question, id: docRef.id };
       setQuestions(prev => [questionWithId, ...prev]);
-      setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium' });
+      setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium', images: [] });
       setShowAskForm(false);
     } catch (error) {
       console.error('Error adding question:', error);
-      // Fallback to local state only
       setQuestions(prev => [question, ...prev]);
-      setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium' });
+      setNewQuestion({ title: '', content: '', tags: [], difficulty: 'medium', images: [] });
       setShowAskForm(false);
     }
+  };
+
+  const handleAddAnswer = async () => {
+    if (!user || !selectedQuestion) {
+      alert('Vui lòng đăng nhập để trả lời!');
+      return;
+    }
+
+    const answer: Answer = {
+      id: Date.now().toString(),
+      userId: user.uid,
+      userName: user.displayName || user.email || 'Người dùng',
+      content: newAnswer.content,
+      images: newAnswer.images,
+      createdAt: new Date(),
+      upvotes: 0,
+      downvotes: 0,
+      isBestAnswer: false,
+      isTeacherAnswer: false // You can implement role checking here
+    };
+
+    try {
+      const questionRef = doc(db, 'questions', selectedQuestion.id);
+      await updateDoc(questionRef, {
+        answers: arrayUnion(answer)
+      });
+
+      // Update local state
+      const updatedQuestion = {
+        ...selectedQuestion,
+        answers: [...selectedQuestion.answers, answer]
+      };
+      setSelectedQuestion(updatedQuestion);
+      setQuestions(prev => prev.map(q => q.id === selectedQuestion.id ? updatedQuestion : q));
+      setNewAnswer({ content: '', images: [] });
+    } catch (error) {
+      console.error('Error adding answer:', error);
+      // Fallback to local state update
+      const updatedQuestion = {
+        ...selectedQuestion,
+        answers: [...selectedQuestion.answers, answer]
+      };
+      setSelectedQuestion(updatedQuestion);
+      setQuestions(prev => prev.map(q => q.id === selectedQuestion.id ? updatedQuestion : q));
+      setNewAnswer({ content: '', images: [] });
+    }
+  };
+
+  const handleEditQuestion = (questionId: string, currentContent: string) => {
+    setEditingQuestion(questionId);
+    setEditContent(currentContent);
+  };
+
+  const handleEditAnswer = (answerId: string, currentContent: string) => {
+    setEditingAnswer(answerId);
+    setEditContent(currentContent);
+  };
+
+  const saveEdit = async (type: 'question' | 'answer', id: string) => {
+    if (type === 'question') {
+      // Update question content
+      const updatedQuestions = questions.map(q => 
+        q.id === id ? { ...q, content: editContent } : q
+      );
+      setQuestions(updatedQuestions);
+      
+      if (selectedQuestion && selectedQuestion.id === id) {
+        setSelectedQuestion({ ...selectedQuestion, content: editContent });
+      }
+    } else {
+      // Update answer content
+      if (selectedQuestion) {
+        const updatedAnswers = selectedQuestion.answers.map(a =>
+          a.id === id ? { ...a, content: editContent } : a
+        );
+        const updatedQuestion = { ...selectedQuestion, answers: updatedAnswers };
+        setSelectedQuestion(updatedQuestion);
+        setQuestions(prev => prev.map(q => q.id === selectedQuestion.id ? updatedQuestion : q));
+      }
+    }
+    
+    setEditingQuestion(null);
+    setEditingAnswer(null);
+    setEditContent('');
+  };
+
+  const cancelEdit = () => {
+    setEditingQuestion(null);
+    setEditingAnswer(null);
+    setEditContent('');
   };
 
   const filteredQuestions = questions.filter(q => {
@@ -231,11 +362,61 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                     {selectedQuestion.createdAt.toLocaleDateString('vi-VN')}
                   </p>
                 </div>
+                {user && user.uid === selectedQuestion.userId && (
+                  <button
+                    onClick={() => handleEditQuestion(selectedQuestion.id, selectedQuestion.content)}
+                    className="text-gray-500 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                )}
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-4">{selectedQuestion.title}</h1>
-              <div className="prose max-w-none mb-6">
-                <p className="text-gray-700 leading-relaxed">{selectedQuestion.content}</p>
-              </div>
+              
+              {editingQuestion === selectedQuestion.id ? (
+                <div className="mb-6">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    rows={4}
+                  />
+                  <div className="flex space-x-2 mt-2">
+                    <button
+                      onClick={() => saveEdit('question', selectedQuestion.id)}
+                      className="flex items-center space-x-1 px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                    >
+                      <Save className="w-3 h-3" />
+                      <span>Lưu</span>
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="flex items-center space-x-1 px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+                    >
+                      <X className="w-3 h-3" />
+                      <span>Hủy</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="prose max-w-none mb-6">
+                  <p className="text-gray-700 leading-relaxed">{selectedQuestion.content}</p>
+                </div>
+              )}
+
+              {/* Question Images */}
+              {selectedQuestion.images && selectedQuestion.images.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                  {selectedQuestion.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Question image ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-2 ml-6">
               {selectedQuestion.isSolved && (
@@ -304,6 +485,14 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                             <span>Câu trả lời hay nhất</span>
                           </div>
                         )}
+                        {user && user.uid === answer.userId && (
+                          <button
+                            onClick={() => handleEditAnswer(answer.id, answer.content)}
+                            className="text-gray-500 hover:text-blue-600 transition-colors duration-200"
+                          >
+                            <Edit className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                       <p className="text-sm text-gray-500">
                         {answer.createdAt.toLocaleDateString('vi-VN')}
@@ -321,9 +510,51 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                     </button>
                   </div>
                 </div>
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed">{answer.content}</p>
-                </div>
+                
+                {editingAnswer === answer.id ? (
+                  <div className="mb-4">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                      rows={4}
+                    />
+                    <div className="flex space-x-2 mt-2">
+                      <button
+                        onClick={() => saveEdit('answer', answer.id)}
+                        className="flex items-center space-x-1 px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                      >
+                        <Save className="w-3 h-3" />
+                        <span>Lưu</span>
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className="flex items-center space-x-1 px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+                      >
+                        <X className="w-3 h-3" />
+                        <span>Hủy</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="prose max-w-none mb-4">
+                    <p className="text-gray-700 leading-relaxed">{answer.content}</p>
+                  </div>
+                )}
+
+                {/* Answer Images */}
+                {answer.images && answer.images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {answer.images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={image}
+                        alt={`Answer image ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
 
@@ -332,13 +563,62 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
               <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
                 <h4 className="font-semibold text-blue-800 mb-4">Thêm câu trả lời của bạn</h4>
                 <textarea
+                  value={newAnswer.content}
+                  onChange={(e) => setNewAnswer(prev => ({ ...prev, content: e.target.value }))}
                   className="w-full p-4 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   rows={4}
                   placeholder="Nhập câu trả lời của bạn..."
                 />
+                
+                {/* Image Upload for Answer */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-blue-800 mb-2">
+                    Thêm hình ảnh (tùy chọn)
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200">
+                      <Upload className="w-4 h-4" />
+                      <span>Chọn ảnh</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e.target.files, 'answer')}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  
+                  {/* Preview Answer Images */}
+                  {newAnswer.images.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                      {newAnswer.images.map((image, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={image}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            onClick={() => removeImage(index, 'answer')}
+                            className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
                 <div className="flex justify-end mt-4">
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
-                    Gửi câu trả lời
+                  <button
+                    onClick={handleAddAnswer}
+                    disabled={!newAnswer.content.trim()}
+                    className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Gửi câu trả lời</span>
                   </button>
                 </div>
               </div>
@@ -434,10 +714,53 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               />
             </div>
+            
+            {/* Image Upload for Question */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Thêm hình ảnh (tùy chọn)
+              </label>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200">
+                  <Upload className="w-4 h-4" />
+                  <span>Chọn ảnh</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e.target.files, 'question')}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+              
+              {/* Preview Question Images */}
+              {newQuestion.images.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                  {newQuestion.images.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        onClick={() => removeImage(index, 'question')}
+                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             <div className="flex space-x-4">
               <button
                 onClick={handleAskQuestion}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                disabled={!newQuestion.title.trim() || !newQuestion.content.trim()}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Đăng câu hỏi
               </button>
@@ -478,6 +801,26 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                   {question.title}
                 </h3>
                 <p className="text-gray-600 mb-4 line-clamp-2">{question.content}</p>
+                
+                {/* Question Images Preview */}
+                {question.images && question.images.length > 0 && (
+                  <div className="flex space-x-2 mb-4">
+                    {question.images.slice(0, 3).map((image, index) => (
+                      <img
+                        key={index}
+                        src={image}
+                        alt={`Question image ${index + 1}`}
+                        className="w-16 h-16 object-cover rounded border border-gray-200"
+                      />
+                    ))}
+                    {question.images.length > 3 && (
+                      <div className="w-16 h-16 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-gray-500 text-xs">
+                        +{question.images.length - 3}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <div className="flex items-center space-x-4">
                   <div className="flex space-x-2">
                     {question.tags.slice(0, 3).map((tag, index) => (
