@@ -174,10 +174,16 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ assignments, onMathJa
                   <p className="text-sm text-blue-600 mt-3">
                     💡 Đăng nhập để lưu tiến độ hoàn thành bài tập và xem tiến trình học tập
                   </p>
-                ✅ Kết quả đã được lưu vào tài khoản của bạn!
-                <a href="/dashboard" className="text-green-600 underline hover:text-green-800 ml-1">
-                  Xem tiến trình học tập →
-                </a>
+                )}
+                
+                {completedAssignments.includes(assignment.id) && (
+                  <p className="text-sm text-green-600 mt-3">
+                    ✅ Kết quả đã được lưu vào tài khoản của bạn!
+                    <a href="/dashboard" className="text-green-600 underline hover:text-green-800 ml-1">
+                      Xem tiến trình học tập →
+                    </a>
+                  </p>
+                )}
               </div>
             </div>
           </div>
