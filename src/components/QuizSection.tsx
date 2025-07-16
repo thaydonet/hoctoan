@@ -48,6 +48,12 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   const finishQuiz = () => {
     setQuizCompleted(true);
     setShowResults(true);
+    
+    // Auto-save result if user is logged in
+    if (user && !isSavingResult) {
+      const score = calculateScore();
+      saveQuizResult(score, allQuestions.length);
+    }
   };
 
   const resetQuiz = () => {
@@ -116,13 +122,6 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   if (quizCompleted) {
     const score = calculateScore();
     const percentage = Math.round((score / allQuestions.length) * 100);
-    
-    // Auto-save result if user is logged in
-    useEffect(() => {
-      if (user && !isSavingResult) {
-        saveQuizResult(score, allQuestions.length);
-      }
-    }, []);
     
     return (
       <div className="max-w-4xl mx-auto">
