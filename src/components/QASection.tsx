@@ -616,15 +616,6 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                         <>
                           <Upload className="w-4 h-4" />
                           <span>Chọn ảnh</span>
-                      {uploadingImages ? (
-                        <>
-                          <Loader className="w-4 h-4 animate-spin" />
-                          <span>Đang tải...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4" />
-                          <span>Chọn ảnh</span>
                         </>
                       )}
                       <input
@@ -632,7 +623,6 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                         multiple
                         accept="image/*"
                         onChange={(e) => handleImageUpload(e.target.files, 'answer')}
-                        disabled={uploadingImages}
                         disabled={uploadingImages}
                         className="hidden"
                       />
