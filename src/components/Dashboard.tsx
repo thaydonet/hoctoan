@@ -109,7 +109,10 @@ const Dashboard: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Cần đăng nhập</h2>
           <p className="text-gray-600 mb-6">Vui lòng đăng nhập để xem tiến trình học tập của bạn.</p>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => {
+              window.history.pushState({}, '', '/');
+              window.location.reload();
+            }}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
           >
             Về trang chủ

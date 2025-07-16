@@ -131,14 +131,16 @@ function App() {
     setCurrentView('dashboard');
     setSelectedChapter(null);
     setSelectedTopic(null);
-    updateURL('dashboard');
+    setActiveSection('theory');
+    window.history.pushState({}, '', '/dashboard');
   };
 
   const handleHomeSelect = () => {
     setCurrentView('home');
     setSelectedChapter(null);
     setSelectedTopic(null);
-    updateURL();
+    setActiveSection('theory');
+    window.history.pushState({}, '', '/');
   };
 
 

@@ -33,7 +33,10 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
           <div className="flex items-center space-x-4">
             {user && (
               <button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => {
+                  window.history.pushState({}, '', '/dashboard');
+                  window.location.reload();
+                }}
                 className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg transition-colors duration-200"
               >
                 <BarChart3 className="w-5 h-5" />

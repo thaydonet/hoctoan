@@ -48,6 +48,16 @@ const Sidebar: React.FC<SidebarProps> = ({
     setIsOpen(false);
   };
 
+  // Get current view from URL to highlight correct menu item
+  const getCurrentView = () => {
+    const path = window.location.pathname;
+    if (path === '/dashboard') return 'dashboard';
+    if (path === '/' || path === '') return 'home';
+    return 'lesson';
+  };
+  
+  const currentView = getCurrentView();
+
   // Đóng sidebar khi click overlay
   const handleOverlayClick = () => setIsOpen(false);
 
