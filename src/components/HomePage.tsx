@@ -1,6 +1,8 @@
 import React from 'react';
-import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, MessageCircle } from 'lucide-react';
+import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, MessageCircle, User } from 'lucide-react';
 import AuthButton from './AuthButton';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase/auth';
 import { mathChapters } from '../data/mathChapters';
 import { Chapter } from '../types/MathTopic';
 
@@ -9,6 +11,8 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
+  const [user] = useAuthState(auth);
+  
   const handleLessonClick = (chapter: Chapter, lesson: any) => {
     if (onTopicSelect) {
       onTopicSelect(chapter, lesson);
@@ -26,7 +30,18 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
         
         {/* Auth Button - Top Right */}
         <div className="absolute top-6 right-6 z-10">
-          <AuthButton />
+          <div className="flex items-center space-x-4">
+            {user && (
+              <button
+                onClick={() => window.location.href = '/dashboard'}
+                className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg transition-colors duration-200"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <span className="font-medium">Tiến trình học tập</span>
+              </button>
+            )}
+            <AuthButton />
+          </div>
         </div>
         
         <div className="relative max-w-7xl mx-auto px-6 py-20">

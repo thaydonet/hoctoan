@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen, ChevronRight, ChevronDown, Home, Trophy } from 'lucide-react';
+import { BookOpen, ChevronRight, ChevronDown, Home, Trophy, BarChart3 } from 'lucide-react';
 import { Chapter, MathTopic } from '../types/MathTopic';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase/auth';
 
 interface SidebarProps {
   chapters: Chapter[];
@@ -8,17 +10,20 @@ interface SidebarProps {
   selectedTopic: MathTopic | null;
   onTopicSelect: (chapter: Chapter, topic: MathTopic) => void;
   onHomeSelect: () => void;
+  onDashboardSelect: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ 
+const Sidebar: React.FC<SidebarProps> = ({
   chapters, 
   selectedChapter, 
   selectedTopic, 
   onTopicSelect, 
-  onHomeSelect
+  onHomeSelect,
+  onDashboardSelect
 }) => {
   const [expandedChapters, setExpandedChapters] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [user] = useAuthState(auth);
 
   const toggleChapter = (chapterId: string) => {
     setExpandedChapters(prev => 
@@ -35,6 +40,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   const handleHomeSelect = () => {
     onHomeSelect();
+    setIsOpen(false);
+  };
+  
+  const handleDashboardSelect = () => {
+    onDashboardSelect();
     setIsOpen(false);
   };
 
@@ -95,6 +105,21 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Home className="w-6 h-6" />
             <span className="font-semibold">Trang chủ</span>
           </button>
+
+          {/* Dashboard Button - Only show if user is logged in */}
+          {user && (
+            <button
+              onClick={handleDashboardSelect}
+              className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 text-left mb-2 ${
+                currentView === 'dashboard'
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
+                  : 'hover:bg-gray-50 text-gray-700'
+              }`}
+            >
+              <BarChart3 className="w-6 h-6" />
+              <span className="font-semibold">Tiến trình học tập</span>
+            </button>
+          )}
 
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Danh sách chương

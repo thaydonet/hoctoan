@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Search, Filter, Clock, User, CheckCircle, Edit, Save, X, Image, Upload } from 'lucide-react';
+import { MessageCircle, Send, ThumbsUp, ThumbsDown, Star, Search, Filter, Clock, User, CheckCircle, Edit, Save, X, Image, Upload, Loader } from 'lucide-react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/auth';
 import { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { uploadMultipleImages } from '../firebase/storage';
 
 interface Question {
   id: string;
@@ -66,6 +67,7 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
   const [editingAnswer, setEditingAnswer] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [user] = useAuthState(auth);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
     onMathJaxRender();
@@ -157,14 +159,42 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
     setQuestions(mockQuestions);
   };
 
-  const handleImageUpload = (files: FileList | null, type: 'question' | 'answer') => {
-    if (!files) return;
+  const handleImageUpload = async (files: FileList | null, type: 'question' | 'answer') => {
+    if (!files || files.length === 0) return;
     
-    // In a real app, you would upload to Firebase Storage or another service
-    // For now, we'll just create placeholder URLs
-    const imageUrls = Array.from(files).map((file, index) => 
-      `https://via.placeholder.com/400x300?text=Image+${index + 1}`
-    );
+    setUploadingImages(true);
+    try {
+      const fileArray = Array.from(files);
+      const path = type === 'question' ? 'questions' : 'answers';
+      const imageUrls = await uploadMultipleImages(fileArray, path);
+      
+      if (type === 'question') {
+        setNewQuestion(prev => ({
+          ...prev,
+          images: [...prev.images, ...imageUrls]
+        }));
+      } else {
+        setNewAnswer(prev => ({
+          ...prev,
+          images: [...prev.images, ...imageUrls]
+        }));
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      alert('Có lỗi khi tải ảnh lên. Vui lòng thử lại!');
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  const handleImageUploadFallback = (files: FileList | null, type: 'question' | 'answer') => {
+    if (!files || files.length === 0) return;
+    
+    // Fallback: Create placeholder URLs if Firebase upload fails
+    const imageUrls = Array.from(files).map((file, index) => {
+      // Create object URL for preview
+      return URL.createObjectURL(file);
+    });
     
     if (type === 'question') {
       setNewQuestion(prev => ({
@@ -576,14 +606,34 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                     Thêm hình ảnh (tùy chọn)
                   </label>
                   <div className="flex items-center space-x-4">
-                    <label className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200">
-                      <Upload className="w-4 h-4" />
-                      <span>Chọn ảnh</span>
+                    <label className={`flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200 ${uploadingImages ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      {uploadingImages ? (
+                        <>
+                          <Loader className="w-4 h-4 animate-spin" />
+                          <span>Đang tải...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          <span>Chọn ảnh</span>
+                      {uploadingImages ? (
+                        <>
+                          <Loader className="w-4 h-4 animate-spin" />
+                          <span>Đang tải...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          <span>Chọn ảnh</span>
+                        </>
+                      )}
                       <input
                         type="file"
                         multiple
                         accept="image/*"
                         onChange={(e) => handleImageUpload(e.target.files, 'answer')}
+                        disabled={uploadingImages}
+                        disabled={uploadingImages}
                         className="hidden"
                       />
                     </label>
@@ -614,11 +664,11 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
                 <div className="flex justify-end mt-4">
                   <button
                     onClick={handleAddAnswer}
-                    disabled={!newAnswer.content.trim()}
+                    disabled={!newAnswer.content.trim() || uploadingImages}
                     className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Gửi câu trả lời</span>
+                    <span>{uploadingImages ? 'Đang tải ảnh...' : 'Gửi câu trả lời'}</span>
                   </button>
                 </div>
               </div>
@@ -759,10 +809,10 @@ const QASection: React.FC<QASectionProps> = ({ chapter, lesson, onMathJaxRender 
             <div className="flex space-x-4">
               <button
                 onClick={handleAskQuestion}
-                disabled={!newQuestion.title.trim() || !newQuestion.content.trim()}
+                disabled={!newQuestion.title.trim() || !newQuestion.content.trim() || uploadingImages}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Đăng câu hỏi
+                {uploadingImages ? 'Đang tải ảnh...' : 'Đăng câu hỏi'}
               </button>
               <button
                 onClick={() => setShowAskForm(false)}

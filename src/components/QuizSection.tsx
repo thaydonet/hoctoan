@@ -99,8 +99,8 @@ const QuizSection: React.FC<QuizSectionProps> = ({
         timeSpent: Date.now(),
         completedAt: new Date(),
         answers: selectedAnswers,
-        chapter: 'Current Chapter',
-        lesson: 'Current Lesson'
+        chapter: 'Chương hiện tại',
+        lesson: 'Bài học hiện tại'
       });
       console.log('Quiz result saved successfully');
     } catch (error) {
@@ -145,7 +145,10 @@ const QuizSection: React.FC<QuizSectionProps> = ({
           {user && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
               <p className="text-green-800 text-sm">
-                ✅ Kết quả đã được lưu vào tài khoản của bạn!
+                ✅ Kết quả đã được lưu vào tài khoản của bạn! 
+                <a href="/dashboard" className="text-green-600 underline hover:text-green-800 ml-1">
+                  Xem tiến trình học tập →
+                </a>
               </p>
             </div>
           )}
@@ -330,7 +333,7 @@ const QuizSection: React.FC<QuizSectionProps> = ({
          
          {!user && (
            <p className="text-sm text-gray-600 mt-3">
-             💡 Đăng nhập để lưu kết quả bài tập
+            💡 Đăng nhập để lưu kết quả bài tập và xem tiến trình học tập
            </p>
          )}
         </div>

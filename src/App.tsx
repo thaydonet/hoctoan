@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import HomePage from './components/HomePage';
+import Dashboard from './components/Dashboard';
 import { mathChapters } from './data/mathChapters';
 import { Chapter, MathTopic } from './types/MathTopic';
 
@@ -22,7 +23,7 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
   const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa'>('theory');
-  const [currentView, setCurrentView] = useState<'home' | 'lesson'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'dashboard'>('home');
 
   // Function to re-render MathJax
   const renderMathJax = () => {
@@ -59,6 +60,14 @@ function App() {
   const parseURL = () => {
     const path = window.location.pathname;
     const segments = path.split('/').filter(Boolean);
+    
+    if (segments[0] === 'dashboard') {
+      setCurrentView('dashboard');
+      setSelectedChapter(null);
+      setSelectedTopic(null);
+      setActiveSection('theory');
+      return;
+    }
     
     if (segments.length >= 2) {
       const [chapterId, topicId, section] = segments;
@@ -118,6 +127,13 @@ function App() {
     updateURL(chapter.id, topic.id, 'theory');
   };
 
+  const handleDashboardSelect = () => {
+    setCurrentView('dashboard');
+    setSelectedChapter(null);
+    setSelectedTopic(null);
+    updateURL('dashboard');
+  };
+
   const handleHomeSelect = () => {
     setCurrentView('home');
     setSelectedChapter(null);
@@ -135,6 +151,8 @@ function App() {
 
   const renderContent = () => {
     switch (currentView) {
+      case 'dashboard':
+        return <Dashboard />;
       case 'lesson':
         return selectedTopic ? (
           <MainContent 
@@ -159,6 +177,7 @@ function App() {
           selectedTopic={selectedTopic}
           onTopicSelect={handleTopicSelect}
           onHomeSelect={handleHomeSelect}
+          onDashboardSelect={handleDashboardSelect}
         />
         <div className="flex-1">
           {renderContent()}
