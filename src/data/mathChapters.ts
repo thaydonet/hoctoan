@@ -30,8 +30,8 @@ export const mathChapters: Chapter[] = [
   },
   {
     id: 'chuong-4',
-    title: 'Chương 4: Hàm số bậc nhất',
-    description: 'Khái niệm và đồ thị hàm số bậc nhất',
+    title: 'Chương 4: Thống kê',
+    description: 'Thu thập và xử lý dữ liệu thống kê',
     lessons: []
   },
   {
@@ -54,8 +54,8 @@ export const mathChapters: Chapter[] = [
   },
   {
     id: 'chuong-8',
-    title: 'Chương 8: Thống kê',
-    description: 'Thu thập và xử lý dữ liệu thống kê',
+    title: 'Chương 8: Hình đồng dạng',
+    description: 'Tính chất các hình đồng dạng',
     lessons: []
   },
   {
