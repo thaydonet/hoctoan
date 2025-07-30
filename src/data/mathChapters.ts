@@ -11,8 +11,7 @@ export const mathChapters: Chapter[] = [
     lessons: [
       c1b1PhanThucDaiSo,
       c1b2PhepCongTru,
-      
-    ]
+     ]
   },
   {
     id: 'chuong-2',
@@ -24,9 +23,7 @@ export const mathChapters: Chapter[] = [
     id: 'chuong-3',
     title: 'Chương 3: Định lí Pythagore - Các loại tứ giác thường gặp',
     description: 'Định lí Pythagore - Các loại tứ giác thường gặp',
-    lessons: [
-      c3b1pythagore,
-    ]
+    lessons: [c3b1pythagore]
   },
   {
     id: 'chuong-4',
