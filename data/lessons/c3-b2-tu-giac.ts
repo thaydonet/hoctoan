@@ -1,6 +1,6 @@
 import { MathTopic } from '../../src/types/MathTopic';
 
-export const c1b1PhanThucDaiSo: MathTopic = {
+export const c3b2tugiac: MathTopic = {
   "id": "tu-giac",
   "title": "Bài 2: Tứ giác",
   "description": "Lý thuyết cơ bản về tứ giác, các yếu tố của tứ giác và tổng các góc trong một tứ giác.",
