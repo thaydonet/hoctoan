@@ -64,7 +64,7 @@ export const c3b1pythagore: MathTopic ={
       ]
     }
   ],
-"quiz": [
+quiz: [
      {
         "id": "1",
         "question": "Cho tam giác DEF vuông tại D. Hệ thức nào sau đây là đúng?",
@@ -186,7 +186,7 @@ export const c3b1pythagore: MathTopic ={
         "explanation": "Gọi đường chéo là d. Ta có $d^2 = 12^2 + 5^2 = 144 + 25 = 169$. Vậy $d = \\sqrt{169} = 13$ cm."
       }
     ],
-    "trueFalse": [
+  trueFalseQuiz: [
       {
         "id": "tf1",
         "question": "Xét tính đúng sai của các khẳng định sau:",
@@ -199,7 +199,7 @@ export const c3b1pythagore: MathTopic ={
         "explanation": "a) Đúng, vì $13^2 = 169$ và $5^2 + 12^2 = 25 + 144 = 169$. b) Sai, phải là $PR^2 = PQ^2 + QR^2$. c) Đúng, vì bình phương cạnh huyền bằng tổng bình phương hai cạnh góc vuông nên nó phải lớn hơn bình phương của mỗi cạnh. d) Sai, vì $12^2 = 144$ và $6^2 + 9^2 = 36 + 81 = 117$, chúng không bằng nhau."
       }
     ],
-    "shortAnswer": [
+  shortAnswerQuiz: [
       {
         "id": "sa1",
         "question": "Người ta buộc một con diều bằng một sợi dây dài 1700 mét. Khi diều bay cao nhất, hình chiếu của nó trên mặt đất cách nơi thả diều 800 mét. Hỏi khi đó con diều bay cao bao nhiêu mét so với mặt đất? (Giả sử dây diều được căng thẳng).",
@@ -209,7 +209,9 @@ export const c3b1pythagore: MathTopic ={
         "hint": "Coi dây diều, độ cao của diều và khoảng cách trên mặt đất tạo thành một tam giác vuông."
       }
     ],
-  "homework": {
+homework:[ 
+  {
+      id: '1',
     "title": "Bài tập về nhà - Định lí Pythagore",
     "problems": [
      "1. Cho tam giác ABC vuông tại B, có AB = 15 cm, BC = 20 cm. Tính độ dài cạnh AC.",
@@ -224,4 +226,5 @@ export const c3b1pythagore: MathTopic ={
       "10. Trong mặt phẳng tọa độ Oxy, cho hai điểm A(2, 1) và B(7, 13). Tính độ dài đoạn thẳng AB."
     ]
   }
-}
+  ]
+};
