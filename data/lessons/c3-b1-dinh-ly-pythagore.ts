@@ -1,4 +1,6 @@
-{
+import { MathTopic } from '../../src/types/MathTopic';
+
+export const c3b1pythagore: MathTopic ={
   "id": "dinh-li-pythagore",
   "title": "Định lí Pythagore",
   "description": "Lý thuyết cơ bản, ví dụ và bài tập về Định lí Pythagore và định lí Pythagore đảo.",
