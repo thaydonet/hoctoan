@@ -2,6 +2,7 @@ import { Chapter } from '../types/MathTopic';
 import { c1b1PhanThucDaiSo } from '../../data/lessons/c1-b1-phan-thuc-dai-so';
 import { c1b2PhepCongTru } from '../../data/lessons/c1-b2-phep-cong-tru';
 import { c3b1pythagore } from '../../data/lessons/c3-b1-dinh-ly-pythagore';
+import { c3b2tugiac } from '../../data/lessons/c3-b2-tu-giac';
 
 export const mathChapters: Chapter[] = [
   {
@@ -23,7 +24,9 @@ export const mathChapters: Chapter[] = [
     id: 'chuong-3',
     title: 'Chương 3: Định lí Pythagore - Các loại tứ giác thường gặp',
     description: 'Định lí Pythagore - Các loại tứ giác thường gặp',
-    lessons: [c3b1pythagore]
+    lessons: [c3b1pythagore,
+             c3b2tugiac,
+             ]
   },
   {
     id: 'chuong-4',
