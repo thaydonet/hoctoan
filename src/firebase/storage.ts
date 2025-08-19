@@ -1,9 +1,7 @@
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './config';
+import { app } from './config';
 
-// Initialize Firebase Storage
-const app = initializeApp(firebaseConfig);
+// Use the existing Firebase app instance
 export const storage = getStorage(app);
 
 // Upload image to Firebase Storage
