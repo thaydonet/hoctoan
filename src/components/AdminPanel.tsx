@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, BookOpen, Edit, Trash2, Save, X, Upload, FileText, Brain, MessageCircle } from 'lucide-react';
+import { Plus, BookOpen, CreditCard as Edit, Trash2, Save, X, Upload, FileText, Brain, MessageCircle } from 'lucide-react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/auth';
 
