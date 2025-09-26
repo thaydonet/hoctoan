@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import HomePage from './components/HomePage';
 import Dashboard from './components/Dashboard';
+import AdminPanel from './components/AdminPanel';
 import { mathChapters } from './data/mathChapters';
 import { Chapter, MathTopic } from './types/MathTopic';
 
@@ -23,7 +24,7 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
   const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa'>('theory');
-  const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'dashboard'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'dashboard' | 'admin'>('home');
 
   // Function to re-render MathJax
   const renderMathJax = () => {
@@ -63,6 +64,14 @@ function App() {
     
     if (segments[0] === 'dashboard') {
       setCurrentView('dashboard');
+      setSelectedChapter(null);
+      setSelectedTopic(null);
+      setActiveSection('theory');
+      return;
+    }
+    
+    if (segments[0] === 'admin') {
+      setCurrentView('admin');
       setSelectedChapter(null);
       setSelectedTopic(null);
       setActiveSection('theory');
@@ -135,6 +144,14 @@ function App() {
     window.history.pushState({}, '', '/dashboard');
   };
 
+  const handleAdminSelect = () => {
+    setCurrentView('admin');
+    setSelectedChapter(null);
+    setSelectedTopic(null);
+    setActiveSection('theory');
+    window.history.pushState({}, '', '/admin');
+  };
+
   const handleHomeSelect = () => {
     setCurrentView('home');
     setSelectedChapter(null);
@@ -155,6 +172,8 @@ function App() {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
+      case 'admin':
+        return <AdminPanel onMathJaxRender={renderMathJax} />;
       case 'lesson':
         return selectedTopic ? (
           <MainContent 
@@ -180,6 +199,7 @@ function App() {
           onTopicSelect={handleTopicSelect}
           onHomeSelect={handleHomeSelect}
           onDashboardSelect={handleDashboardSelect}
+          onAdminSelect={handleAdminSelect}
         />
         <div className="flex-1">
           {renderContent()}

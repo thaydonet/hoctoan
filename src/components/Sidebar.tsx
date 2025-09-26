@@ -11,6 +11,7 @@ interface SidebarProps {
   onTopicSelect: (chapter: Chapter, topic: MathTopic) => void;
   onHomeSelect: () => void;
   onDashboardSelect: () => void;
+  onAdminSelect: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -19,7 +20,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedTopic, 
   onTopicSelect, 
   onHomeSelect,
-  onDashboardSelect
+  onDashboardSelect,
+  onAdminSelect
 }) => {
   const [expandedChapters, setExpandedChapters] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -47,11 +49,17 @@ const Sidebar: React.FC<SidebarProps> = ({
     onDashboardSelect();
     setIsOpen(false);
   };
+  
+  const handleAdminSelect = () => {
+    onAdminSelect();
+    setIsOpen(false);
+  };
 
   // Get current view from URL to highlight correct menu item
   const getCurrentView = () => {
     const path = window.location.pathname;
     if (path === '/dashboard') return 'dashboard';
+    if (path === '/admin') return 'admin';
     if (path === '/' || path === '') return 'home';
     return 'lesson';
   };
@@ -128,6 +136,21 @@ const Sidebar: React.FC<SidebarProps> = ({
             >
               <BarChart3 className="w-6 h-6" />
               <span className="font-semibold">Tiến trình học tập</span>
+            </button>
+          )}
+
+          {/* Admin Button - Only show if user is admin */}
+          {user && (user.email?.includes('admin') || user.email?.includes('teacher')) && (
+            <button
+              onClick={handleAdminSelect}
+              className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 text-left mb-2 ${
+                currentView === 'admin'
+                  ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg'
+                  : 'hover:bg-gray-50 text-gray-700'
+              }`}
+            >
+              <BookOpen className="w-6 h-6" />
+              <span className="font-semibold">Quản lý Admin</span>
             </button>
           )}
 
