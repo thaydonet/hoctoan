@@ -14,9 +14,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({ topic, activeSection, onS
     { id: 'flashcards', label: 'Flashcards', icon: Zap, color: 'purple' },
     { id: 'examples', label: 'Ví dụ', icon: FileText, color: 'green' },
     { id: 'quiz', label: 'Trắc nghiệm', icon: Brain, color: 'orange' },
-    { id: 'homework', label: 'Bài tập', icon: PenTool, color: 'red' },
-    { id: 'qa', label: 'Hỏi đáp', icon: MessageCircle, color: 'indigo' }
-    { id: 'qa', label: 'Hỏi đáp', icon: MessageCircle, color: 'blue' }
+    { id: 'homework', label: 'Bài tập', icon: PenTool, color: 'red' }
   ] as const;
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, MessageCircle, User } from 'lucide-react';
+import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, User } from 'lucide-react';
 import AuthButton from './AuthButton';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/auth';
@@ -194,21 +194,6 @@ const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
               <p className="text-gray-600 leading-relaxed text-sm">
                 Trắc nghiệm, đúng-sai, trả lời ngắn và bài tập thực hành đa dạng
               </p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
-                <MessageCircle className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Hỏi đáp cộng đồng</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                Hỏi đáp với cộng đồng học sinh và giáo viên, chia sẻ kiến thức
-              </p>
-              <div className="mt-4">
-                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                  Cần đăng nhập
-                </span>
-              </div>
             </div>
 
           </div>

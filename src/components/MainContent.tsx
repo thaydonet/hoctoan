@@ -6,12 +6,11 @@ import FlashcardsSection from './FlashcardsSection';
 import ExamplesSection from './ExamplesSection';
 import QuizSection from './QuizSection';
 import HomeworkSection from './HomeworkSection';
-import QASection from './QASection';
 
 interface MainContentProps {
   topic: MathTopic;
-  activeSection: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa';
-  onSectionChange: (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa') => void;
+  activeSection: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework';
+  onSectionChange: (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework') => void;
   onMathJaxRender: () => void;
 }
 
@@ -33,8 +32,6 @@ const MainContent: React.FC<MainContentProps> = ({ topic, activeSection, onSecti
         />;
       case 'homework':
         return <HomeworkSection assignments={topic.homework} onMathJaxRender={onMathJaxRender} />;
-      case 'qa':
-        return <QASection chapter={topic.title} lesson={topic.description} onMathJaxRender={onMathJaxRender} />;
       default:
         return <TheorySection theory={topic.theory} onMathJaxRender={onMathJaxRender} />;
     }

@@ -37,9 +37,8 @@ const Dashboard: React.FC = () => {
   const [user] = useAuthState(auth);
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
   const [homeworkSubmissions, setHomeworkSubmissions] = useState<HomeworkSubmission[]>([]);
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'quiz' | 'homework' | 'qa'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'quiz' | 'homework'>('overview');
 
   useEffect(() => {
     if (user) {
@@ -79,20 +78,6 @@ const Dashboard: React.FC = () => {
         completedAt: doc.data().completedAt?.toDate() || new Date()
       })) as HomeworkSubmission[];
       setHomeworkSubmissions(homeworkData);
-
-      // Load user's questions
-      const questionsQuery = query(
-        collection(db, 'questions'),
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      );
-      const questionsSnapshot = await getDocs(questionsQuery);
-      const questionsData = questionsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date()
-      })) as Question[];
-      setQuestions(questionsData);
 
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -139,15 +124,11 @@ const Dashboard: React.FC = () => {
       ? Math.round(quizResults.reduce((sum, result) => sum + result.percentage, 0) / totalQuizzes)
       : 0;
     const totalHomework = homeworkSubmissions.length;
-    const totalQuestions = questions.length;
-    const solvedQuestions = questions.filter(q => q.isSolved).length;
 
     return {
       totalQuizzes,
       averageScore,
-      totalHomework,
-      totalQuestions,
-      solvedQuestions
+      totalHomework
     };
   };
 
@@ -187,17 +168,6 @@ const Dashboard: React.FC = () => {
               <p className="text-purple-100 text-sm">Đã hoàn thành</p>
             </div>
             <BookOpen className="w-12 h-12 text-purple-200" />
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100 text-sm">Câu hỏi</p>
-              <p className="text-3xl font-bold">{stats.totalQuestions}</p>
-              <p className="text-orange-100 text-sm">Đã đặt</p>
-            </div>
-            <MessageCircle className="w-12 h-12 text-orange-200" />
           </div>
         </div>
       </div>
@@ -424,8 +394,7 @@ const Dashboard: React.FC = () => {
             {[
               { id: 'overview', label: 'Tổng quan', icon: BarChart3 },
               { id: 'quiz', label: 'Trắc nghiệm', icon: Trophy },
-              { id: 'homework', label: 'Bài tập', icon: BookOpen },
-              { id: 'qa', label: 'Hỏi đáp', icon: MessageCircle }
+              { id: 'homework', label: 'Bài tập', icon: BookOpen }
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -450,7 +419,6 @@ const Dashboard: React.FC = () => {
         {activeTab === 'overview' && renderOverview()}
         {activeTab === 'quiz' && renderQuizResults()}
         {activeTab === 'homework' && renderHomework()}
-        {activeTab === 'qa' && renderQA()}
       </div>
     </div>
   );

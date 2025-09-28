@@ -23,7 +23,7 @@ declare global {
 function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
-  const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa'>('theory');
+  const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework'>('theory');
   const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'dashboard' | 'admin'>('home');
 
   // Function to re-render MathJax
@@ -161,7 +161,7 @@ function App() {
   };
 
 
-  const handleSectionChange = (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework' | 'qa') => {
+  const handleSectionChange = (section: 'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework') => {
     setActiveSection(section);
     if (selectedChapter && selectedTopic) {
       updateURL(selectedChapter.id, selectedTopic.id, section);
