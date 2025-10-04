@@ -1,23 +1,19 @@
 import React, { useState } from 'react';
 import { Plus, BookOpen, CreditCard as Edit, Trash2, Save, X, Upload, FileText, Brain, MessageCircle } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase/auth';
+import { useAuth } from '../hooks/useAuth';
 
 interface AdminPanelProps {
   onMathJaxRender: () => void;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onMathJaxRender }) => {
-  const [user] = useAuthState(auth);
+  const { user, profile, isTeacher } = useAuth();
   const [activeTab, setActiveTab] = useState<'lessons' | 'bulk-import' | 'templates'>('lessons');
   const [showNewLessonForm, setShowNewLessonForm] = useState(false);
   const [bulkImportData, setBulkImportData] = useState('');
   const [importFormat, setImportFormat] = useState<'json' | 'text'>('json');
 
-  // Check if user is admin (you can implement proper role checking)
-  const isAdmin = user?.email?.includes('admin') || user?.email?.includes('teacher');
-
-  if (!user || !isAdmin) {
+  if (!user || !isTeacher) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
@@ -25,7 +21,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onMathJaxRender }) => {
             <X className="w-8 h-8 text-red-500" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Không có quyền truy cập</h2>
-          <p className="text-gray-600 mb-6">Chỉ admin và giáo viên mới có thể truy cập trang này.</p>
+          <p className="text-gray-600 mb-6">Chỉ giáo viên mới có thể truy cập trang này.</p>
         </div>
       </div>
     );

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, ChevronRight, ChevronDown, Home, Trophy, BarChart3 } from 'lucide-react';
 import { Chapter, MathTopic } from '../types/MathTopic';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase/auth';
+import { useAuth } from '../hooks/useAuth';
 
 interface SidebarProps {
   chapters: Chapter[];
@@ -25,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [expandedChapters, setExpandedChapters] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [user] = useAuthState(auth);
+  const { user, isTeacher } = useAuth();
 
   const toggleChapter = (chapterId: string) => {
     setExpandedChapters(prev => 
@@ -139,8 +138,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
 
-          {/* Admin Button - Only show if user is admin */}
-          {user && (user.email?.includes('admin') || user.email?.includes('teacher')) && (
+          {/* Admin Button - Only show if user is teacher */}
+          {user && isTeacher && (
             <button
               onClick={handleAdminSelect}
               className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 text-left mb-2 ${

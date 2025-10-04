@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, Check, X, RotateCcw, Trophy, CheckCircle, XCircle, Edit3 } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, addDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase/auth';
+import { useAuth } from '../hooks/useAuth';
 import { QuizQuestion, TrueFalseQuestion, ShortAnswerQuestion } from '../types/MathTopic';
 
 interface QuizSectionProps {
@@ -28,7 +26,7 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   const [selectedAnswers, setSelectedAnswers] = useState<any[]>(new Array(allQuestions.length).fill(undefined));
   const [showResults, setShowResults] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [isSavingResult, setIsSavingResult] = useState(false);
 
   useEffect(() => {
@@ -83,31 +81,9 @@ const QuizSection: React.FC<QuizSectionProps> = ({
     return correct;
   };
 
-  // Save quiz result to Firebase
   const saveQuizResult = async (score: number, totalQuestions: number) => {
     if (!user) return;
-    
-    setIsSavingResult(true);
-    try {
-      await addDoc(collection(db, 'quizResults'), {
-        userId: user.uid,
-        userName: user.displayName || user.email,
-        quizType: 'mixed',
-        score: score,
-        totalQuestions: totalQuestions,
-        percentage: Math.round((score / totalQuestions) * 100),
-        timeSpent: Date.now(),
-        completedAt: new Date(),
-        answers: selectedAnswers,
-        chapter: 'Chương hiện tại',
-        lesson: 'Bài học hiện tại'
-      });
-      console.log('Quiz result saved successfully');
-    } catch (error) {
-      console.error('Error saving quiz result:', error);
-    } finally {
-      setIsSavingResult(false);
-    }
+    console.log('Quiz completed:', { score, totalQuestions });
   };
 
   if (allQuestions.length === 0) {

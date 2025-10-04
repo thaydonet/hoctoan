@@ -1,8 +1,7 @@
 import React from 'react';
 import { BookOpen, Calculator, TrendingUp, Shapes, Box, BarChart3, Users, Clock, Target, User } from 'lucide-react';
 import AuthButton from './AuthButton';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase/auth';
+import { useAuth } from '../hooks/useAuth';
 import { mathChapters } from '../data/mathChapters';
 import { Chapter } from '../types/MathTopic';
 
@@ -11,7 +10,7 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onTopicSelect }) => {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   
   const handleLessonClick = (chapter: Chapter, lesson: any) => {
     if (onTopicSelect) {

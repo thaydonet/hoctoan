@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PenTool, ExternalLink, Save, CheckCircle } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
-import { auth, db } from '../firebase/auth';
+import { useAuth } from '../hooks/useAuth';
 import { HomeworkAssignment } from '../types/MathTopic';
 
 interface HomeworkSectionProps {
@@ -11,7 +9,7 @@ interface HomeworkSectionProps {
 }
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ assignments, onMathJaxRender }) => {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [completedAssignments, setCompletedAssignments] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,18 +26,6 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ assignments, onMathJa
 
   const loadCompletedAssignments = async () => {
     if (!user) return;
-    
-    try {
-      const q = query(
-        collection(db, 'homeworkSubmissions'),
-        where('userId', '==', user.uid)
-      );
-      const querySnapshot = await getDocs(q);
-      const completed = querySnapshot.docs.map(doc => doc.data().assignmentId);
-      setCompletedAssignments(completed);
-    } catch (error) {
-      console.error('Error loading completed assignments:', error);
-    }
   };
 
   const markAsCompleted = async (assignmentId: string) => {
@@ -48,24 +34,8 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ assignments, onMathJa
       return;
     }
 
-    setIsLoading(true);
-    try {
-      await addDoc(collection(db, 'homeworkSubmissions'), {
-        userId: user.uid,
-        userName: user.displayName || user.email,
-        assignmentId: assignmentId,
-        completedAt: new Date(),
-        submissionType: 'google_form'
-      });
-      
-      setCompletedAssignments(prev => [...prev, assignmentId]);
-      alert('Đã đánh dấu hoàn thành bài tập!');
-    } catch (error) {
-      console.error('Error marking assignment as completed:', error);
-      alert('Có lỗi xảy ra khi lưu tiến độ!');
-    } finally {
-      setIsLoading(false);
-    }
+    setCompletedAssignments(prev => [...prev, assignmentId]);
+    alert('Đã đánh dấu hoàn thành bài tập!');
   };
   if (assignments.length === 0) {
     return (
