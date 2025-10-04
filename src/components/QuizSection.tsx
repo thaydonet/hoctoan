@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, Check, X, RotateCcw, Trophy, CheckCircle, XCircle, Edit3 } from 'lucide-react';
+import { Brain, Check, X, RotateCcw, Trophy, CheckCircle, XCircle, CreditCard as Edit3 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { QuizQuestion, TrueFalseQuestion, ShortAnswerQuestion } from '../types/MathTopic';
 
