@@ -13,7 +13,7 @@ export type UserProfile = {
   id: string;
   email: string;
   full_name: string | null;
-  role: 'student' | 'teacher';
+  role: 'student' | 'teacher' | 'super_admin';
   avatar_url: string | null;
   reputation: number;
   questions_asked: number;

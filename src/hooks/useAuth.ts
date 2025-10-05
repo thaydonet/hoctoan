@@ -51,5 +51,6 @@ export const useAuth = () => {
     loading,
     isTeacher: profile?.role === 'teacher',
     isStudent: profile?.role === 'student',
+    isSuperAdmin: profile?.role === 'super_admin',
   };
 };

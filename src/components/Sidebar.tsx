@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ChevronRight, ChevronDown, Home, Trophy, BarChart3 } from 'lucide-react';
+import { BookOpen, ChevronRight, ChevronDown, Home, Trophy, BarChart3, Shield } from 'lucide-react';
 import { Chapter, MathTopic } from '../types/MathTopic';
 import { useAuth } from '../hooks/useAuth';
 
@@ -11,20 +11,22 @@ interface SidebarProps {
   onHomeSelect: () => void;
   onDashboardSelect: () => void;
   onAdminSelect: () => void;
+  onSuperAdminSelect: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  chapters, 
-  selectedChapter, 
-  selectedTopic, 
-  onTopicSelect, 
+  chapters,
+  selectedChapter,
+  selectedTopic,
+  onTopicSelect,
   onHomeSelect,
   onDashboardSelect,
-  onAdminSelect
+  onAdminSelect,
+  onSuperAdminSelect
 }) => {
   const [expandedChapters, setExpandedChapters] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isTeacher } = useAuth();
+  const { user, isTeacher, isSuperAdmin } = useAuth();
 
   const toggleChapter = (chapterId: string) => {
     setExpandedChapters(prev => 
@@ -54,11 +56,16 @@ const Sidebar: React.FC<SidebarProps> = ({
     setIsOpen(false);
   };
 
-  // Get current view from URL to highlight correct menu item
+  const handleSuperAdminSelect = () => {
+    onSuperAdminSelect();
+    setIsOpen(false);
+  };
+
   const getCurrentView = () => {
     const path = window.location.pathname;
     if (path === '/dashboard') return 'dashboard';
     if (path === '/admin') return 'admin';
+    if (path === '/superadmin') return 'superadmin';
     if (path === '/' || path === '') return 'home';
     return 'lesson';
   };
@@ -150,6 +157,21 @@ const Sidebar: React.FC<SidebarProps> = ({
             >
               <BookOpen className="w-6 h-6" />
               <span className="font-semibold">Quản lý Admin</span>
+            </button>
+          )}
+
+          {/* Super Admin Button - Only show if user is super admin */}
+          {user && isSuperAdmin && (
+            <button
+              onClick={handleSuperAdminSelect}
+              className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 text-left mb-2 ${
+                currentView === 'superadmin'
+                  ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
+                  : 'hover:bg-gray-50 text-gray-700'
+              }`}
+            >
+              <Shield className="w-6 h-6" />
+              <span className="font-semibold">Super Admin</span>
             </button>
           )}
 

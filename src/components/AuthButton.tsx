@@ -175,17 +175,22 @@ const AuthModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
 
           {!isLogin && (
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isTeacher"
-                checked={isTeacher}
-                onChange={(e) => setIsTeacher(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="isTeacher" className="text-sm text-gray-700">
-                Tôi là giáo viên
-              </label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isTeacher"
+                  checked={isTeacher}
+                  onChange={(e) => setIsTeacher(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="isTeacher" className="text-sm text-gray-700">
+                  Tôi là giáo viên
+                </label>
+              </div>
+              <p className="text-xs text-gray-500">
+                Lưu ý: Chỉ đăng ký là học sinh hoặc giáo viên. Super Admin được nâng cấp bởi quản trị viên.
+              </p>
             </div>
           )}
 

@@ -22,7 +22,7 @@ export const signUpWithEmail = async (
   email: string,
   password: string,
   fullName: string,
-  role: 'student' | 'teacher' = 'student'
+  role: 'student' | 'teacher' | 'super_admin' = 'student'
 ) => {
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -91,6 +91,38 @@ export const updatePassword = async (newPassword: string) => {
   const { error } = await supabase.auth.updateUser({
     password: newPassword,
   });
+
+  if (error) throw error;
+};
+
+export const getAllUsers = async (): Promise<UserProfile[]> => {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+
+  return data || [];
+};
+
+export const promoteUser = async (userId: string, newRole: 'student' | 'teacher' | 'super_admin') => {
+  const { error } = await supabase.rpc('promote_user', {
+    target_user_id: userId,
+    new_role: newRole
+  });
+
+  if (error) throw error;
+};
+
+export const deleteUser = async (userId: string) => {
+  const { error } = await supabase
+    .from('user_profiles')
+    .delete()
+    .eq('id', userId);
 
   if (error) throw error;
 };

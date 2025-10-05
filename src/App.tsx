@@ -4,6 +4,7 @@ import MainContent from './components/MainContent';
 import HomePage from './components/HomePage';
 import Dashboard from './components/Dashboard';
 import AdminPanel from './components/AdminPanel';
+import SuperAdminPanel from './components/SuperAdminPanel';
 import { mathChapters } from './data/mathChapters';
 import { Chapter, MathTopic } from './types/MathTopic';
 
@@ -24,7 +25,7 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<MathTopic | null>(null);
   const [activeSection, setActiveSection] = useState<'theory' | 'flashcards' | 'examples' | 'quiz' | 'homework'>('theory');
-  const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'dashboard' | 'admin'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'lesson' | 'dashboard' | 'admin' | 'superadmin'>('home');
 
   // Function to re-render MathJax
   const renderMathJax = () => {
@@ -72,6 +73,14 @@ function App() {
     
     if (segments[0] === 'admin') {
       setCurrentView('admin');
+      setSelectedChapter(null);
+      setSelectedTopic(null);
+      setActiveSection('theory');
+      return;
+    }
+
+    if (segments[0] === 'superadmin') {
+      setCurrentView('superadmin');
       setSelectedChapter(null);
       setSelectedTopic(null);
       setActiveSection('theory');
@@ -152,6 +161,14 @@ function App() {
     window.history.pushState({}, '', '/admin');
   };
 
+  const handleSuperAdminSelect = () => {
+    setCurrentView('superadmin');
+    setSelectedChapter(null);
+    setSelectedTopic(null);
+    setActiveSection('theory');
+    window.history.pushState({}, '', '/superadmin');
+  };
+
   const handleHomeSelect = () => {
     setCurrentView('home');
     setSelectedChapter(null);
@@ -174,9 +191,11 @@ function App() {
         return <Dashboard />;
       case 'admin':
         return <AdminPanel onMathJaxRender={renderMathJax} />;
+      case 'superadmin':
+        return <SuperAdminPanel />;
       case 'lesson':
         return selectedTopic ? (
-          <MainContent 
+          <MainContent
             topic={selectedTopic}
             activeSection={activeSection}
             onSectionChange={handleSectionChange}
@@ -192,7 +211,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="flex">
-        <Sidebar 
+        <Sidebar
           chapters={mathChapters}
           selectedChapter={selectedChapter}
           selectedTopic={selectedTopic}
@@ -200,6 +219,7 @@ function App() {
           onHomeSelect={handleHomeSelect}
           onDashboardSelect={handleDashboardSelect}
           onAdminSelect={handleAdminSelect}
+          onSuperAdminSelect={handleSuperAdminSelect}
         />
         <div className="flex-1">
           {renderContent()}
