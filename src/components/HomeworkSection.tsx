@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PenTool, ExternalLink, Save, CheckCircle } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { PenTool, ExternalLink, CheckCircle } from 'lucide-react';
 import { HomeworkAssignment } from '../types/MathTopic';
 
 interface HomeworkSectionProps {
@@ -9,31 +8,13 @@ interface HomeworkSectionProps {
 }
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ assignments, onMathJaxRender }) => {
-  const { user } = useAuth();
   const [completedAssignments, setCompletedAssignments] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     onMathJaxRender();
   }, [onMathJaxRender]);
 
-  // Load completed assignments for logged-in user
-  useEffect(() => {
-    if (user) {
-      loadCompletedAssignments();
-    }
-  }, [user]);
-
-  const loadCompletedAssignments = async () => {
-    if (!user) return;
-  };
-
-  const markAsCompleted = async (assignmentId: string) => {
-    if (!user) {
-      alert('Vui lòng đăng nhập để lưu tiến độ!');
-      return;
-    }
-
+  const markAsCompleted = (assignmentId: string) => {
     setCompletedAssignments(prev => [...prev, assignmentId]);
     alert('Đã đánh dấu hoàn thành bài tập!');
   };
@@ -128,30 +109,20 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ assignments, onMathJa
                     <span>Mở Google Form</span>
                   </a>
                   
-                  {user && !completedAssignments.includes(assignment.id) && (
+                  {!completedAssignments.includes(assignment.id) && (
                     <button
                       onClick={() => markAsCompleted(assignment.id)}
-                      disabled={isLoading}
-                      className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
+                      className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
-                      <Save className="w-5 h-5" />
-                      <span>{isLoading ? 'Đang lưu...' : 'Đánh dấu hoàn thành'}</span>
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Đánh dấu hoàn thành</span>
                     </button>
                   )}
                 </div>
                 
-                {!user && (
-                  <p className="text-sm text-blue-600 mt-3">
-                    💡 Đăng nhập để lưu tiến độ hoàn thành bài tập và xem tiến trình học tập
-                  </p>
-                )}
-                
                 {completedAssignments.includes(assignment.id) && (
                   <p className="text-sm text-green-600 mt-3">
-                    ✅ Kết quả đã được lưu vào tài khoản của bạn!
-                    <a href="/dashboard" className="text-green-600 underline hover:text-green-800 ml-1">
-                      Xem tiến trình học tập →
-                    </a>
+                    ✅ Đã đánh dấu hoàn thành!
                   </p>
                 )}
               </div>

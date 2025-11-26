@@ -110,24 +110,6 @@ const QuizSection: React.FC<QuizSectionProps> = ({
             Bạn đã trả lời đúng {score}/{allQuestions.length} câu
           </p>
           
-          {!user && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-blue-800 text-sm">
-                💡 Đăng nhập để lưu kết quả và theo dõi tiến độ học tập của bạn!
-              </p>
-            </div>
-          )}
-          
-          {user && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <p className="text-green-800 text-sm">
-                ✅ Kết quả đã được lưu vào tài khoản của bạn! 
-                <a href="/dashboard" className="text-green-600 underline hover:text-green-800 ml-1">
-                  Xem tiến trình học tập →
-                </a>
-              </p>
-            </div>
-          )}
           
           <button
             onClick={resetQuiz}
@@ -306,12 +288,6 @@ const QuizSection: React.FC<QuizSectionProps> = ({
           >
             Hoàn thành ({selectedAnswers.filter(a => a !== undefined).length}/{allQuestions.length})
           </button>
-         
-         {!user && (
-           <p className="text-sm text-gray-600 mt-3">
-            💡 Đăng nhập để lưu kết quả bài tập và xem tiến trình học tập
-           </p>
-         )}
         </div>
       </div>
     </div>
